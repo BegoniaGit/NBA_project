@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style>
+		.text_name_list{
+			font-size: 10px;
+			fill: hsla(59, 100%, 81%, 0.76);
+		}
+		.text_value{
+			fill:white;
+			font-size:14px;
+			text-anchor:middle;
+		}
+		.domain,.tick{
+			stroke-width: 0.3px;
+			fill: none;
+			stroke: #888;
+		}
+		.tick text, .tick-text {
+			fill: #888;
+			font-size: 12px;
+		}
+		text {
+			fill: #888;
+			font-family: inherit;
+			font-size: 14px;
+		}
+		.order_asc_text{
+			fill: #ececec;
+			font-family: inherit;
+			font-size: 14px;
+		}
+		.axis path, .axis line {
+			fill: none;
+			stroke: #888;
+		}
+		.overlay{
+			fill:none;
+			pointer-events: all;
+		}
+		svg{
+			pointer-events: all;
+		}
+
+	</style>
+</head>
+<body>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="d3.v3.min.js"></script> -->
+
+<script>
+        var width=window.screen.width ;
+        var height=window.screen.height ;
+    d3.json("/getAll",function(adata){
+
+        var margin={left:20,top:20,right:20,down:20};
+        var line_a_color="#4e37a0",
+            line_b_color="#A0372F",
+			svg_background="#f1bb5b";
+        var svg=d3.select("body")
+            .append("svg")
+			.style("background-color",svg_background)
+            .attr("width",width)
+            .attr("height",height);
+        var panel_right=svg.append("g")
+            .attr("transform",'translate('+300+','+50+')');
+
+
+        var name_a='Aaron Brooks';
+        var name_b='Brandon Bass';
+        var playerA=getPlayerData(name_a,adata);
+        var playerB=getPlayerData(name_b,adata);
+
+		var basic_information_g=svg.append("g")
+			.attr("transform",'translate('+0+','+margin.top+')')
+
+        var img_a=basic_information_g.append("image")
+            .attr("x",20)
+            .attr("width",100)
+            .attr("height",100)
+            .attr("xlink:href","/test/"+playerA[4][0]);
+        var img_b=basic_information_g.append("image")
+           .attr("x",140)
+            .attr("width",100)
+            .attr("height",100)
+            .attr("xlink:href","/test/"+playerB[4][0]);
+
+        var legend_g=basic_information_g.append("g")
+                .attr("transform",'translate('+20+','+120+')');
+
+            rect_a=legend_g.append("rect")
+                .attr("transform",'translate('+10+','+0+')')
+                .attr("width",10)
+                .attr("height",10)
+                .attr("fill",line_a_color),
+
+            rect_b=legend_g.append("rect")
+                .attr("transform",'translate('+130+','+0+')')
+                .attr("width",10)
+                .attr("height",10)
+                .attr("fill",line_b_color);
+        
+        var text_a=legend_g.append("text")
+            .text(name_a)
+            .attr("transform",'translate('+20+','+9+')')
+            .style("font-size","11px")
+        var text_b=legend_g.append("text")
+            .text(name_b)
+            .attr("transform",'translate('+140+','+9+')')
+            .style("font-size","11px")
+            .attr("font-size","12px")
+
+        var lineAllX=2012;//标线;
+        //画图方法开始;
+
+
+        //图1 start;
+        var g_1 = panel_right.append("g")
+            .attr("transform", 'translate(' +margin.left+ ',' +margin.top+ ')')
+        var array_scale_1=compareNumber(playerA[0],playerB[0])
+
+        //制作比例尺;
+        var linear_y_1=d3.scale.linear()
+            .domain([array_scale_1.max,array_scale_1.min])
+            .range([0,160]);
+        var linear_x_1=d3.scale.linear()
+            .domain([2012,2016])
+            .range([0,260]);
+
+        //制作坐标;
+        var x_axis_1=d3.svg.axis()
+            .scale(linear_x_1)
+            .orient("bottom")
+            .ticks(5)
+            .tickFormat(d3.format("d"));
+        var y_axis_1=d3.svg.axis()
+            .scale(linear_y_1)
+            .orient("left")
+            .ticks(5)
+            .tickFormat(d3.format("%"));
+
+        //画坐标
+        var append_x_axis_1 = g_1.append("g")
+            .attr("transform", 'translate(' + 0 + ',' + 180 + ')')
+            .call(x_axis_1)
+            .append("text")
+            .text("years")
+            .attr("transform", 'translate(' + (linear_x_1(2014) + 7) + ',' + 34 + ')');
+        var append_y_axis_1 = g_1.append("g")
+            .attr("class","axis")
+            .attr("transform", 'translate(' + 0 + ',' + 20 + ')')
+            .call(y_axis_1)
+            .append("text")
+            .text("Frequency %")
+            .attr("transform", 'rotate(-90)')
+            .attr("dx", "-9em")
+            .attr("dy", "-3em")
+
+        g_1.append("text")
+            .text("Effective pitching frequency % by year")
+        linear_y_1.range([160, 0]);
+        var linePath_1 = d3.svg.line()
+        //.interpolate("basis")
+            .x(function (d, i) {
+                return linear_x_1(i + 2012)
+            })
+            .y(function (d) {
+                return 160 - linear_y_1(d);
+            });
+
+        //折线;
+        var line_a_1 = g_1.append("path")
+            .attr("class",".zhe_line")
+            .attr("transform", 'translate(' + 0 + ',' + margin.top + ')')
+            .attr("d", linePath_1(playerA[0]))
+            .attr("stroke", line_a_color)
+            .attr("stroke-width", "1px")
+            .attr("fill", "none");
+        var line_b_1 = g_1.append("path")
+            .attr("class",".zhe_line")
+            .attr("transform", 'translate(' + 0 + ',' + margin.top + ')')
+            .attr("d", linePath_1(playerB[0]))
+            .attr("stroke", line_b_color)
+            .attr("stroke-width", "1px")
+            .attr("fill", "none");
+
+        //焦点监听
+        var focusCircle_a_1=g_1.append("g")
+            .attr("class","focusCircle")
+            .style("display","none");
+        var focusCircle_b_1=g_1.append("g")
+            .attr("class","focusCircle")
+            .style("display","none");
+        var line_1=g_1.append("g")
+            .attr("class","line")
+            .attr("x1",0)
+            .attr("x2",0)
+            .attr("y1",20)
+            .attr("y2",220)
+            .style("display","none")
+        // var imf_rect_a_1=g_1.append("rect")
+        //     .attr("width","50")
+        //     .attr("height","40")
+        //     .attr("fill","yellow")
+        //     .attr("fill-opacity",0.5)
+        //     .style("display",null);
+
+        focusCircle_a_1.append("circle")
+            .attr("fill","#6d6d6d")
+            .attr("r",3);
+        focusCircle_b_1.append("circle")
+            .attr("fill","#6d6d6d")
+            .attr("r",3);
+
+        focusCircle_a_1.append("text")
+            .attr("dx",10)
+            .attr("dy","1em")
+            .style("font-size","10px")
+            .style("fill",line_a_color);
+        focusCircle_b_1.append("text")
+            .attr("dx",10)
+            .attr("dy","1em")
+            .style("font-size","10px")
+            .style("fill",line_b_color);
+        var hLine_1=line_1.append("line")
+            .attr("stroke","#b1b1b1")
+            .style("stroke-width",0.5);
+
+
+
+        //图1 END;
+
+        //图2 start;
+        var g_2 = panel_right.append("g")
+            .attr("transform", 'translate(' +(margin.left+400)+ ',' +margin.top+ ')')
+        var array_scale_2=compareNumber(playerA[1],playerB[1])
+
+        //制作比例尺;
+        var linear_y_2=d3.scale.linear()
+            .domain([array_scale_2.max,array_scale_2.min])
+            .range([0,160]);
+
+        //制作坐标;
+        var y_axis_2=d3.svg.axis()
+            .scale(linear_y_2)
+            .orient("left")
+            .ticks(5)
+        //.tickFormat(d3.format("%"));
+
+        //画坐标
+        var append_x_axis_2 = g_2.append("g")
+            .attr("transform", 'translate(' + 0 + ',' + 180 + ')')
+            .call(x_axis_1)
+            .append("text")
+            .text("years")
+            .attr("transform", 'translate(' + (linear_x_1(2014) + 7) + ',' + 34 + ')');
+        var append_y_axis_2 = g_2.append("g")
+            .attr("class","axis")
+            .attr("transform", 'translate(' + 0 + ',' + 20 + ')')
+            .call(y_axis_2)
+            .append("text")
+            .text("Number")
+            .attr("transform", 'rotate(-90)')
+            .attr("dx", "-9em")
+            .attr("dy", "-3em")
+
+        g_2.append("text")
+            .text("The number of mistakes by year")
+        linear_y_2.range([160, 0]);
+        var linePath_2 = d3.svg.line()
+        //.interpolate("basis")
+            .x(function (d, i) {
+                return linear_x_1(i + 2012)
+            })
+            .y(function (d) {
+                return 160 - linear_y_2(d);
+            });
+
+        //折线;
+        var line_a_2 = g_2.append("path")
+            .attr("class",".zhe_line")
+            .attr("transform", 'translate(' + 0 + ',' + margin.top + ')')
+            .attr("d", linePath_2(playerA[1]))
+            .attr("stroke", line_a_color)
+            .attr("stroke-width", "1px")
+            .attr("fill", "none");
+        var line_b_2 = g_2.append("path")
+            .attr("class",".zhe_line")
+            .attr("transform", 'translate(' + 0 + ',' + margin.top + ')')
+            .attr("d", linePath_2(playerB[1]))
+            .attr("stroke", line_b_color)
+            .attr("stroke-width", "1px")
+            .attr("fill", "none");
+
+        //焦点监听
+        var focusCircle_a_2=g_2.append("g")
+            .attr("class","focusCircle")
+            .style("display","none");
+        var focusCircle_b_2=g_2.append("g")
+            .attr("class","focusCircle")
+            .style("display","none");
+        var line_2=g_2.append("g")
+            .attr("class","line")
+            .attr("x1",0)
+            .attr("x2",0)
+            .attr("y1",20)
+            .attr("y2",220)
+            .style("display","none")
+        focusCircle_a_2.append("circle")
+            .attr("fill","#6d6d6d")
+            .attr("r",3);
+        focusCircle_b_2.append("circle")
+            .attr("fill","#6d6d6d")
+            .attr("r",3);
+
+        focusCircle_a_2.append("text")
+            .attr("dx",10)
+            .attr("dy","1em")
+            .style("font-size","10px")
+            .style("fill",line_a_color);
+        focusCircle_b_2.append("text")
+            .attr("dx",10)
+            .attr("dy","1em")
+            .style("font-size","10px")
+            .style("fill",line_b_color);;
+        var hLine_2=line_2.append("line")
+            .attr("stroke","#b1b1b1")
+            .style("stroke-width",0.5);
+
+
+        //图2 END;
+
+
+		//矩形监听;
+		var x_move=-1;
+        panel_right.append("g")
+            .attr("transform",'translate('+margin.left+','+margin.top*2+')')
+            .append("rect")
+            .attr("class","overlay")
+            .attr("x",0)
+            .attr("y",0)
+            .attr("width",660)
+            .attr("height",160)
+            .attr("fill","yellow")
+            .on("mouseover",function(){
+                focusCircle_a_1.style("display",null);
+                focusCircle_b_1.style("display",null);
+                line_1.style("display",null);
+                // imf_rect_a_1.style("display",null);
+                focusCircle_a_2.style("display",null);
+                focusCircle_b_2.style("display",null);
+                line_2.style("display",null);
+            })
+            .on("mouseout",function(){
+                focusCircle_a_1.style("display","none");
+                focusCircle_b_1.style("display","none");
+                line_1.style("display","none");
+                // imf_rect_a_1.style("display","none");
+                focusCircle_a_2.style("display","none");
+                focusCircle_b_2.style("display","none");
+                line_2.style("display","none");
+            })
+            .on("mousemove",function() {
+                //获取鼠标位置;
+                var mouse_x_1 = d3.mouse(this)[0];
+                if (400 <= mouse_x_1 && mouse_x_1 <= 660) mouse_x_1 -= 400;
+                else if (mouse_x_1 > 260) mouse_x_1 = 260;
+                mouse_x_1 += 40;
+
+                var x0_1 = parseInt(linear_x_1.invert(mouse_x_1));
+                lineAllX = x0_1;
+
+                //x0,y0为真实值;
+                var y0_1 = playerA[0][x0_1 - 2012];
+                //计算焦点位置;
+                var focusX_1 = linear_x_1(x0_1);
+                var focusY_1 = 160 - linear_y_1(y0_1) + margin.top;
+                var focusY_1_2 = (160 - linear_y_1(playerB[0][x0_1 - 2012]) + margin.top);
+                var focusY_max = d3.min([focusY_1_2, focusY_1]);
+                focusCircle_a_1
+                    .transition()
+                    .duration(50)
+                    .attr("transform", 'translate(' + focusX_1 + ',' + focusY_1 + ')');
+                focusCircle_b_1
+                    .transition()
+                    .duration(50)
+                    .attr("transform", 'translate(' + focusX_1 + ',' + focusY_1_2 + ')');
+                //焦点文字;
+                focusCircle_a_1.select("text").text(x0_1 + "Frequency %:" + parseInt(y0_1 * 100) + "%");
+                focusCircle_b_1.select("text").text(x0_1 + "Frequency %:" + parseInt(playerB[0][x0_1 - 2012] * 100) + "%");
+                hLine_1
+                    .transition()
+                    .duration(50)
+                    .attr("x1", focusX_1)
+                    .attr("x2", focusX_1)
+                    .attr("y1", focusY_max)
+                    .attr("y2", 180);
+                // if(focusX_1<d3.mouse(this)[0])
+                // imf_rect_a_1.attr("transform","translate("+mou+","+d3.mouse(this)[1]+")");
+                //焦点and文字;
+                focusCircle_a_2
+                    .transition()
+                    .duration(50)
+                    .attr("transform", 'translate(' + focusX_1 + ',' + (160 - linear_y_2(playerA[1][x0_1 - 2012]) + margin.top) + ')');
+                focusCircle_b_2
+                    .transition()
+                    .duration(50)
+                    .attr("transform", 'translate(' + focusX_1 + ',' + (160 - linear_y_2(playerB[1][x0_1 - 2012]) + margin.top) + ')');
+                focusCircle_a_2.select("text").text(x0_1 + "Number:" + parseInt(playerA[1][x0_1 - 2012]));
+                focusCircle_b_2.select("text").text(x0_1 + "Number:" + parseInt(playerB[1][x0_1 - 2012]));
+                hLine_2
+                    .transition()
+                    .duration(50)
+                    .attr("x1", focusX_1)
+                    .attr("x2", focusX_1)
+                    .attr("y1", d3.min([160 - linear_y_2(playerA[1][x0_1 - 2012]) + margin.top, 160 - linear_y_2(playerB[1][x0_1 - 2012]) + margin.top]))
+                    .attr("y2", 180);
+
+
+                if (x_move != lineAllX) {
+                    pai_name();
+                    updata_right_text_a();
+                    updata_right_text_b();
+
+                }
+            });
+
+
+        function pai_name(){
+
+            d3.json("/get/"+pai_title+"/" + lineAllX, function (adata_order_asc) {
+                order_text_set
+                    .attr("fill-opacity", 0)
+                    .data(d3.transpose(adata_order_asc)[0])
+                    .text(function (d, i) {
+                        return d;
+                    })
+                    .attr("x",function(d){return 110-7.5*(d.length/2);})
+                    .transition()
+                    .duration(1000)
+                    .attr("fill-opacity", 1);
+                name_rect_list
+                    .data(d3.shuffle(rect_list_order))
+                    .transition()
+                    .duration(500)
+                    .attr("y", function (d, i) {
+                        return d * 40
+                    })
+                x_move = lineAllX;
+
+                var data_b=getName_pai_data(adata_order_asc)
+				var data_max=data_b.slice(240,265)
+                im_rects
+
+					.data(data_b.slice(0,240))
+					.attr("opacity",0)
+                    .transition()
+                    .duration(1000)
+                    .attr("opacity",1)
+					.attr("fill",function(d,i){
+                        return getColor(d/data_max[parseInt(i/10)]);
+                    })
+
+            });
+		}
+        //四图公用;
+
+
+		var rect_list_order=[0,1,2,3,4,5,6,7,8,9];
+        
+		//排名;
+        var dr=d3.behavior.drag()
+            .origin(function(d,i){return {x:10,y:d*40};})
+            .on("drag",function(d){
+                d3.select(this).attr("x",d3.event.x)
+                    .attr("y",d3.event.y);
+
+            })
+			.on("dragend",function(d){
+                d3.select(this).attr("x",10)
+                    .attr("y",d*40);
+			})
+
+		var color_scale=d3.scale.category10()
+		var name_rect_list_g=svg.append("g")
+            .attr("transform",'translate('+20+','+200+')')
+		var name_rect_list=name_rect_list_g
+			.selectAll("rect")
+			.data(rect_list_order)
+			.enter()
+			.append("rect")
+            .style("opacity",0.7)
+			.attr("x",10)
+			.attr("y",function(d,i){return d*40})
+			.attr("width",200)
+			.attr("height",30)
+			.attr("fill",function(d,i){return color_scale(d);})
+			.call(dr);
+
+		//阶梯颜色;
+        function getColor(per){
+            var a = d3.rgb("#ffe63b");
+            var b = d3.rgb("#ea4625");
+            var computeA = d3.interpolate(a,b);
+           	return computeA(1-per);
+        }
+	var order_text_set;
+	var pai_title="S",
+		pai_year="2012"
+	var rect_im_area=svg.append("g")
+		.attr("transform",'translate('+300+','+300+')')
+		var rect_im_juzhen_rect=rect_im_area.append("g")
+			.attr("transform",'translate('+0+','+25+')');
+        var im_rects;
+        d3.json("/get/"+pai_title+"/"+pai_year,function(adata_order_asc)
+        {
+            order_text_set=name_rect_list_g.selectAll("text")
+				.data(d3.transpose(adata_order_asc)[0])
+				.enter()
+				.append("text")
+				.attr("class","order_asc_text")
+				.text(function(d,i){return d;})
+				.attr("x",function(d){return 110-7.5*(d.length/2);})
+                .attr("y",function(d,i){return i*40+19})
+
+            //矩阵图;
+            var arr_rect_d=getName_pai_data(adata_order_asc);
+            var arr_rect_d_max=arr_rect_d.slice(240,265);
+
+                im_rects=rect_im_juzhen_rect.selectAll("rect")
+                .data(arr_rect_d.slice(0,240))
+                .enter()
+                .append("rect")
+                .attr("x",function(d,i){
+                    return parseInt(i/10)*28;
+                })
+                .attr("y",function(d,i){
+                    return i%10*26;
+                })
+                .attr("width",25)
+                .attr("height",21)
+                .attr("fill",function(d,i){
+                    return getColor(d/arr_rect_d_max[parseInt(i/10)]);
+				})
+
+        });
+		function getName_pai_data(data){
+		    var _data=d3.transpose(data);
+		    var arr=[];
+		    var arr_max=[];
+		    for(var i=0;i<27;i++)
+                if (i != 0 && i != 6&&i!=5){
+		        arr_max.push(d3.max(_data[i],function(d){return d;}))
+                    for(var j=0;j<10;j++)
+                        arr.push(_data[i][j]);
+
+				}
+						console.log(arr_max);
+
+                        console.log(arr.concat(arr_max));
+
+		    return arr.concat(arr_max);
+		}
+
+
+        //right Text
+       	
+		var title=svg.append("g")
+			.attr("transform",'translate('+(0.75*width)+','+10+')')
+			.append("text")
+			.text("NBA Data visualization")
+            .attr("dx", "-1.2em")
+            .attr("dy", "1em")
+			.style("font-size","32px")
+			.style("fill","black");
+          var right_area=svg.append("g")
+		       		.attr("transform",'translate('+(0.75*width)+','+70+')');
+          //画右边矩形
+		  var right_text_rect=right_area.append("rect")
+				    .attr("x",0)
+				    .attr("y",10)
+		       		.attr("width",280)
+		       		.attr("height",580)
+		       		.attr("fill","#f1f4ff")
+			        .attr("opacity",0.2);
+
+        var right_texts;
+        d3.json("/getTowPlayerData/" + name_a + "/2012", function (right_text_imfor_data) {
+            right_texts = right_area.append("g")
+				.attr("transform",'translate('+120+','+20+')')
+				.selectAll("text")
+                .data(right_text_imfor_data)
+                .enter()
+                .append("text")
+                .text(function (d) {
+                    if(d=="0")return "--";
+                    return d;
+                })
+                .attr("y", function (d, i) {
+                    return i * 20;
+                })
+				.attr("x",function(d){return -9*(d.length/2);})
+                .attr("dx", 10)
+                .attr("dy", "1em")
+                .style("font-size", "14px")
+        });
+        var right_texts_b;
+        d3.json("/getTowPlayerData/" + name_b + "/2012", function (right_text_imfor_data) {
+            right_texts_b = right_area.append("g")
+                .attr("transform",'translate('+220+','+20+')')
+				.selectAll("text")
+                .data(right_text_imfor_data)
+                .enter()
+                .append("text")
+                .text(function (d) {
+                    if(d=="0")return "--";
+                    return d;
+                })
+                .attr("y", function (d, i) {
+                    return i * 20;
+                })
+                .attr("x",function(d){return -8*(d.length/2);})
+                .attr("dx", 10)
+                .attr("dy", "1em")
+                .style("font-size", "14px")
+        });
+
+        //获取表头字段;
+			d3.json("/getHead",function(arry_text_head){
+			  right_area.append("g")
+				.attr("transform",'translate('+20+','+20+')')
+				.selectAll("text")
+				.data(arry_text_head)
+				.enter()
+				.append("text")
+				.text(function (d) {
+					return d;
+				})
+				.attr("y", function (d, i) {
+					return i * 20;
+				})
+				.attr("x",function(d){return -7*(d[0].length/2);})
+				.attr("dx", 10)
+				.attr("dy", "1em")
+				.style("font-size", "14px")
+				  .on("click",function(){
+				      var _title=d3.select(this).text();
+				      if(_title!="Player"&&_title!="IM"&&_title!="Y"){
+				          pai_title=_title;
+                          pai_name();
+					  }
+
+
+				  });
+
+			  var text_juzheng=[];
+			  for(var i=0;i<arry_text_head.length;i++)
+			      if(arry_text_head[i]!="Player"&&arry_text_head[i]!="Y"&&arry_text_head[i]!="IM")
+			          text_juzheng.push(arry_text_head[i]);
+			  console.log(text_juzheng);
+              var juzheng_texts=rect_im_area.append("g")
+				  .attr("transform",'translate('+(-10)+','+5+')')
+				  .selectAll("text")
+				  .attr("transform",'translate('+0+','+0+')')
+				  .data(text_juzheng)
+				  .enter()
+				  .append("text")
+				  .text(function(d){return d[0];})
+				  .attr("x",function(d,i){return i*28;})
+                  .attr("dx", 13)
+                  .attr("dy", "1em")
+                  .style("font-size", "10px")
+            });
+
+			//更新右侧数据的方法;
+		function updata_right_text_a(){
+            d3.json("/getTowPlayerData/" + name_a + "/" + lineAllX, function (right_text_imfor_data) {
+                right_texts.data(right_text_imfor_data)
+                    .text(function (d) {
+                        if(d=="0")return "--";
+                        return d;
+                    })
+                    .attr("x",function(d){return -8*(d.length/2);})
+            });
+
+		}
+
+        function updata_right_text_b(){
+            d3.json("/getTowPlayerData/" + name_b + "/" + lineAllX, function (right_text_imfor_data) {
+                right_texts_b.data(right_text_imfor_data)
+                    .text(function (d) {
+                        if(d=="0")return "--";
+                        return d;
+                    })
+                    .attr("x",function(d){return -8*(d.length/2);})
+
+            });
+        }
+
+
+
+        //姓名列表的点击监听;
+        var nameList=getName(adata);
+        var isA=1;
+
+        var back=svg.append("rect")
+            .attr("transform",'translate(0,700)')
+            .attr("width",width)
+            .attr("height",400)
+            .attr("fill","#8f1d78")
+            .style("display","none")
+            .style("opacity",0.8);
+        var name_pan=svg.append("g")
+            .attr("transform",'translate(0,700)')
+            .style("display","none")
+
+        var nameItem=name_pan.selectAll("text")
+            .data(nameList)
+            .enter()
+            .append("text")
+            .attr("class","text_name_list")
+            .text(function(d){return d;})
+            .attr("x",function (d,i) {
+                return i%13*100;
+            })
+            .attr("y",function(d,i){
+                return parseInt(i/13)*20;
+            })
+            .attr("dx",10)
+            .attr("dy","1em")
+            .style("font-size","10px")
+            .on("click",function(){
+                if(isA==1) {
+                    playerA=getPlayerData(d3.select(this).text(),adata);
+                    text_a.text(d3.select(this).text())
+					name_a=d3.select(this).text();
+                    updata_right_text_a()
+                    isA=0;
+                }
+                else {
+                    playerB=getPlayerData(d3.select(this).text(),adata);
+                    text_b.text(d3.select(this).text())
+                    name_b=d3.select(this).text();
+                    updata_right_text_b()
+                    isA=1;
+                }
+                console.log(playerA[0])
+                array_scale_1=compareNumber(playerA[0],playerB[0])
+                array_scale_2=compareNumber(playerA[1],playerB[1])
+
+                //更新比例尺;
+                linear_y_1.domain([array_scale_1.max,array_scale_1.min])
+                    .range([0,160]);
+                linear_y_2.domain([array_scale_2.max,array_scale_2.min])
+                    .range([0,160]);
+                //更新坐标轴;
+                y_axis_1.scale(linear_y_1)
+                g_1.selectAll("g.axis").call(y_axis_1);
+                y_axis_2.scale(linear_y_2)
+                g_2.selectAll("g.axis").call(y_axis_2);
+
+                linear_y_1.range([160,0]);
+                linear_y_2.range([160,0]);
+                line_a_1
+                    .transition()
+                    .duration(1000)
+                    .attr("d", linePath_1(playerA[0]))
+                line_b_1
+                    .transition()
+                    .duration(1000)
+                    .attr("d", linePath_1(playerB[0]))
+
+                line_a_2
+                    .transition()
+                    .duration(1000)
+                    .attr("d", linePath_2(playerA[1]))
+                line_b_2
+                    .transition()
+                    .duration(1000)
+                    .attr("d", linePath_2(playerB[1]));
+                img_a.attr("xlink:href","/test/"+playerA[4][0]);
+                img_b.attr("xlink:href","/test/"+playerB[4][0]);
+            });
+//			  .;
+//        console.log(getFro;mDbAll(name_a))
+//		function getFromDbAll(name){
+//		    var data=null;
+//			d3.json("/getTowPlayerData/"+name+"/2013",function(right_text_imfor_data){
+//
+//				data=right_text_imfor_data;
+//			});
+//        while(!data){}
+//		return data;
+//        }
+       // d3.json("/getTowPlayerData/Aaron Brooks/2013",function(right_text_imfor_data){
+       // 		console.log(right_text_imfor_data[0]);
+       // 		var arr=right_text_imfor_data[0];
+       // 		var right_text_imfor=haha(arr);
+
+       // 		function haha(arr){
+       // 			var data="";
+       // 			for(var i=0;i<arr.length;i++)
+       // 					data+=(arr[i]+"<br/>");
+       			
+       // 			return data;
+       // 		}
+       			
+		     //  right_text.append("text")
+		     //    		.text(right_text_imfor)
+       		
+
+       // });
+
+        //监听姓名列表的缩放;
+        var count=1;
+        svg.on("click",function(){
+            if(d3.mouse(this)[1]>570&&count==1)
+            {
+                name_pan.style("display",null)
+                    .transition()
+                    .duration(800)
+                    .attr("transform",'translate(0,250)');
+                back.style("display",null)
+                    .transition()
+                    .duration(800)
+                    .attr("transform",'translate(0,230)');
+                count=0;
+            }
+            if(d3.mouse(this)[1]<240&&count==0)
+            {
+                name_pan.transition()
+                    .duration(800)
+                    .attr("transform",'translate(0,800)')
+                    .transition()
+                    .delay(800)
+                    .style("display","none");
+                back.transition()
+                    .duration(800)
+                    .attr("transform",'translate(0,800)')
+                    .transition()
+                    .delay(800)
+                    .style("display","none");
+                count=1;}
+        })
+        //图例;
+        // var legend=panel_right.append("g")
+        //         .attr("transform",'translate('+780+','+60+')'),
+            
+            
+    });
+</script>
+<script>
+
+
+</script>
+<script>
+    function myArray(r,c) {
+        var arr=new Array(r)
+        for(var i=0;i<r;i++)
+            arr[i]=new Array(c);
+        return arr;
+    }
+
+    function getPlayerData(name,a_data){
+        var count=0,player=myArray(5,5);
+        for(var i=0;i<a_data.length;i++){
+            if(a_data[i][0]==name) {
+                for (var j = 1; j < a_data[i].length; j++)
+                    player[count][j - 1] = parseFloat(a_data[i][j]);
+                count++;
+            }
+            if(count==5)break;
+        }
+        var trans_player=myArray(5,5);
+        for(var i=0;i<5;i++)
+            for(var j=0;j<5;j++)
+                trans_player[j][i]=player[i][j];
+        return trans_player;
+    }
+
+    function compareNumber(array_a,array_b){
+        var a_max=d3.max(array_a),
+            a_min=d3.min(array_a),
+            b_max=d3.max(array_b),
+            b_min=d3.min(array_b),
+            max=d3.max([a_max,b_max]),
+            min=d3.min([a_min,b_min]);
+        return {max:max,min:min};
+    }
+
+    function getName(data){
+        var arr=new Array(data.length/5);
+        var count=0;
+        for(var i=0;i<data.length;i++){
+            if(i==0||data[i][0]!=data[i-1][0])arr[count++]=data[i][0];
+        }
+        return arr;
+    }
+</script>
+</body>
+</html>
