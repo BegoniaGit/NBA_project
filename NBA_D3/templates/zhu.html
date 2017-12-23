@@ -52,6 +52,8 @@
 <script>
         var width=window.screen.width ;
         var height=window.screen.height ;
+
+        //读取球员综合数据;
     d3.json("/getAll",function(adata){
 
         var margin={left:20,top:20,right:20,down:20};
@@ -65,7 +67,6 @@
             .attr("height",height);
         var panel_right=svg.append("g")
             .attr("transform",'translate('+300+','+50+')');
-
 
         var name_a='Aaron Brooks';
         var name_b='Brandon Bass';
@@ -199,12 +200,6 @@
             .attr("y1",20)
             .attr("y2",220)
             .style("display","none")
-        // var imf_rect_a_1=g_1.append("rect")
-        //     .attr("width","50")
-        //     .attr("height","40")
-        //     .attr("fill","yellow")
-        //     .attr("fill-opacity",0.5)
-        //     .style("display",null);
 
         focusCircle_a_1.append("circle")
             .attr("fill","#6d6d6d")
@@ -396,8 +391,7 @@
                     .attr("x2", focusX_1)
                     .attr("y1", focusY_max)
                     .attr("y2", 180);
-                // if(focusX_1<d3.mouse(this)[0])
-                // imf_rect_a_1.attr("transform","translate("+mou+","+d3.mouse(this)[1]+")");
+
                 //焦点and文字;
                 focusCircle_a_2
                     .transition()
@@ -417,7 +411,6 @@
                     .attr("y1", d3.min([160 - linear_y_2(playerA[1][x0_1 - 2012]) + margin.top, 160 - linear_y_2(playerB[1][x0_1 - 2012]) + margin.top]))
                     .attr("y2", 180);
 
-
                 if (x_move != lineAllX) {
                     pai_name();
                     updata_right_text_a();
@@ -428,7 +421,6 @@
 
 
         function pai_name(){
-
             d3.json("/get/"+pai_title+"/" + lineAllX, function (adata_order_asc) {
                 order_text_set
                     .attr("fill-opacity", 0)
@@ -565,7 +557,6 @@
 
 
         //right Text
-       	
 		var title=svg.append("g")
 			.attr("transform",'translate('+(0.75*width)+','+10+')')
 			.append("text")
@@ -698,8 +689,6 @@
             });
         }
 
-
-
         //姓名列表的点击监听;
         var nameList=getName(adata);
         var isA=1;
@@ -782,35 +771,6 @@
                 img_a.attr("xlink:href","/test/"+playerA[4][0]);
                 img_b.attr("xlink:href","/test/"+playerB[4][0]);
             });
-//			  .;
-//        console.log(getFro;mDbAll(name_a))
-//		function getFromDbAll(name){
-//		    var data=null;
-//			d3.json("/getTowPlayerData/"+name+"/2013",function(right_text_imfor_data){
-//
-//				data=right_text_imfor_data;
-//			});
-//        while(!data){}
-//		return data;
-//        }
-       // d3.json("/getTowPlayerData/Aaron Brooks/2013",function(right_text_imfor_data){
-       // 		console.log(right_text_imfor_data[0]);
-       // 		var arr=right_text_imfor_data[0];
-       // 		var right_text_imfor=haha(arr);
-
-       // 		function haha(arr){
-       // 			var data="";
-       // 			for(var i=0;i<arr.length;i++)
-       // 					data+=(arr[i]+"<br/>");
-       			
-       // 			return data;
-       // 		}
-       			
-		     //  right_text.append("text")
-		     //    		.text(right_text_imfor)
-       		
-
-       // });
 
         //监听姓名列表的缩放;
         var count=1;
@@ -843,18 +803,8 @@
                     .style("display","none");
                 count=1;}
         })
-        //图例;
-        // var legend=panel_right.append("g")
-        //         .attr("transform",'translate('+780+','+60+')'),
-            
-            
     });
-</script>
-<script>
-
-
-</script>
-<script>
+//方法区
     function myArray(r,c) {
         var arr=new Array(r)
         for(var i=0;i<r;i++)
